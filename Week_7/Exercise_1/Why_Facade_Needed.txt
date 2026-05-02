@@ -1,0 +1,36 @@
+"Old, messy code"
+
+"Why this code needs a facade:
+
+1. Code is difficult to read.
+2. High coupling about low-level services.
+3. Complex Logic: The client has to manage the step-by-step order of the booking process itself.
+4. Code Duplication: This messy code must be copied and pasted every time a new booking is made.
+5. Heavy Client: The client does too much work by managing all the booking 
+   steps instead of just asking for a result.
+
+
+public class BookingFacade {
+    private final RoomService rooms = new RoomService();
+    private final PaymentService payment = new PaymentService();
+    private final LoyaltyPoints loyalty = new LoyaltyPoints();
+    private final EmailService email = new EmailService();
+
+    public void bookRoom(String guest, String roomType, double price) {
+        if (!rooms.isAvailable(roomType)) {
+            System.out.println("Room not available");
+            return;
+        }
+
+        if (payment.charge(guest, price)) {
+            rooms.book(roomType, guest);
+            loyalty.addPoints(guest, (int) price);
+            email.sendConfirmation(guest, roomType);
+            System.out.println("Booking confirmed");
+        } else {
+            System.out.println("Payment declined");
+        }
+    }
+}
+
+
